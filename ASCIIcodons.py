@@ -5,7 +5,7 @@ DNA representation of 256-ASCII Character Encoding
 
 Michael Ting
 15 July 2013
-Updated 16 July 2013
+Updated 17 July 2013
 
 DNA is represented alphabetically as base 4:
     A - 0
@@ -22,6 +22,8 @@ import itertools
 """======================================================================="""
 
 """Variables for language translation"""
+
+# TEMPORARY FIX, SHOULD FOCUS ON UNIFORM MAPPING OF CHARACTERS
 """
 basevals = {'A':0,
             'C':1,
