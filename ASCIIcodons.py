@@ -22,11 +22,16 @@ import itertools
 """======================================================================="""
 
 """Variables for language translation"""
-
+"""
 basevals = {'A':0,
             'C':1,
             'G':2,
             'T':3}
+"""            
+basevals = {'T':0,
+            'A':1,
+            'G':2,
+            'C':3}
 bases = ['A','C','G','T']
 # retrieve all length 4 dna base strings
 codons = []
