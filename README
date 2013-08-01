@@ -9,9 +9,28 @@ Package to translate ASCII text to DNA. 256-character ASCII is used to translate
 to 4-base DNA codons, analogous to the quaternary numeral system where T:0, A:1,
 G:2, C:3.
 
+Two options are available:
+	- Codon Translation
+	- Direct Binary Translation
+
+#=======#
+# Notes #
+#=======#
+
+DNA output from binaryDNA will be twice as long as the output from ASCIIcodons.
+
+ASCIIcodons encodes 256 characters using 4-base codons (4^4 distinct codons).
+Therefore, one character corresponds to 4 DNA bases.
+
+binaryDNA encodes one-to-one between binary and DNA bases, with 0 mapping to
+A or C and 1 mapping to G or T. Binary representations of ASCII codes are
+a byte (or 8 bits) long, so one character corresponds to 8 DNA bases.
+
 #=============#
 # Future Work #
 #=============#
+
+===Codons===
 
 A known issue is that standard English alphabet characters are encoded within
 the range of values 64-128, meaning using base 4 encoding creates a skewed
@@ -32,7 +51,7 @@ ASCII characters.
 - Allow reverse translation in 4 different reading frames
 
 #===================#
-# Using the Package #
+# Using ASCIIcodons #
 #===================#
 
 Current object classes included:
@@ -62,6 +81,38 @@ For reverse translation from DNA to ASCII text:
 To use all object classes simultaneously:
 
 >>> from ASCIIcodons import *
+
+#=================#
+# Using binaryDNA #
+#=================#
+
+Current object classes include:
+
+* BinaryTextToDNA
+* DNAToBinaryText
+
+To translate input files, start up the Python interpreter and instantiate
+one of the above object classes:
+
+>>> from binaryDNA import BinaryTextToDNA
+>>> obj = BinaryTextToDNA()
+
+To Translate an ASCII text file to DNA through binary, specify input and output files:
+
+>>> obj.translate("/path/to/ASCIItextfile","/path/to/outputfile")
+
+The output file will print to the screen, and can also be accessed from the
+specific path location.
+
+For reverse translation from DNA to ASCII text through binary:
+
+>>> from binaryDNA import DNAToBinaryText
+>>> obj = DNAToBinaryText()
+>>> obj.translate("/path/to/dnatextfile","/path/to/outputfile")
+
+To use all object classes simultaneously:
+
+>>> from binaryDNA import *
 
 #=====================#
 # Formatting of files #
