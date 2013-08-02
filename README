@@ -2,7 +2,7 @@
 #===============================================================================#
 # ASCII Text to DNA 4-Base Codon Translator					#
 # Michael Ting									#
-# 1 August 2013									#
+# 2 August 2013									#
 #===============================================================================#
 
 Package to translate ASCII text to DNA. 256-character ASCII is used to translate
@@ -11,7 +11,7 @@ G:2, C:3.
 
 Two options are available:
 	- Codon Translation
-	- Direct Binary Translation
+	- Binary Intermediate Translation
 
 #=======#
 # Notes #
