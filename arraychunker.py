@@ -28,6 +28,7 @@ $ python
 
 """
 
+import os
 from argparse import ArgumentParser
  
 def process_file(infile, stepsize, chunksize, stuffer):
@@ -231,6 +232,8 @@ def main():
     
     for dna in orderlist:
         newfile.write("%s\n"% dna)
+        newfile.flush()
+        os.fsync(newfile.fileno())
         
     template.close()
     newfile.close()

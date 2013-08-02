@@ -1,0 +1,32 @@
+"""
+Splits a FASTA file of DNA into pieces for array orders
+
+***REQUIRED***
+
+- Run with contig and step size as 76
+- TAG at head of dna is format $ _ _ # _ _ _
+  meaning 7 characters, so 28 DNA bases
+- To ensure mod 4, pad the ends of the DNA with 2 bases (106 --> 104, padded with AA at the end)
+- 104-28 = 76 for the chunk size
+- stuffer sequence is TGAC, corresponding to single quote '
+
+Steps to replicate:
+$ python arraychunker.py outfile.txt 76 76 TGAC
+$ python
+>>> import os
+>>> infile = open("outfile.txt","r")
+>>> newfile = open("new.txt","w")
+>>> for line in infile:
+...     newfile.write("%s\n" % line[2:])    # to account for correct reading frame since adaptor is 22 bp
+...	newfile.flush()
+...	os.fsync(newfile.fileno())
+>>>	infile.close()
+>>>	newfile.close()
+$ ls
+$ python
+>>> from ASCIIcodons import *
+>>> o = DNAToText()
+>>> o.translate("new.txt","trans.txt")
+
+
+"""

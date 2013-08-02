@@ -13,7 +13,7 @@ Splits a FASTA file of DNA into pieces for array orders
 - stuffer sequence is TGAC, corresponding to single quote '
 
 Steps to replicate:
-$ python arraychunker.py outfile.txt 48 48 TGAC
+$ python arraychunker.py outfile.txt 48 48 ACGACTGT
 $ python
 >>> infile = open("outfile.txt","r")
 >>> newfile = open("framecorrect.txt","w")
@@ -28,6 +28,7 @@ $ python
 
 """
 
+import os
 from argparse import ArgumentParser
  
 def process_file(infile, stepsize, chunksize, stuffer):
@@ -103,6 +104,7 @@ def get_chunks(seq, stepsize, chunksize, stuffer):
     #CHUNKSIZE = 106    
     SEQLEN = len(seq)
     #STUFFER = "TGAC"
+    #00100111 == ACGACTGT
     
     clst = []    
     
@@ -114,8 +116,8 @@ def get_chunks(seq, stepsize, chunksize, stuffer):
             chunk = seq[index:]
             # add a stuffer sequence
             remaining = chunksize - len(chunk)
-            stuffnum = int(remaining / 4)   # the number of stuffer sequences to add
-            tail = remaining % 4            # how much of the stuffer to add at the end
+            stuffnum = int(remaining / 8)   # the number of stuffer sequences to add
+            tail = remaining % 8            # how much of the stuffer to add at the end
             chunk += stuffer*stuffnum + stuffer[:tail]
         else:    
             chunk = seq[index:index+chunksize]
@@ -195,7 +197,7 @@ def stuff_ends(clst, chunksize, pid):
         # add index tag to piece
         tag = pstart + pidstr + cstart + contdna
         # create padded dna
-        padded = universalA + tag + chunk + RC_universalB + 'AA' # AA needed when using coding length %4 = 0
+        padded = universalA + tag + chunk + RC_universalB + 'AA' # AA needed when using coding length %8 = 0
         #if len(padded) != CONTIGSIZE:
         #    raise IOError("Chunk size incorrect!")
         stuffedlist.append(padded)
@@ -231,6 +233,8 @@ def main():
     
     for dna in orderlist:
         newfile.write("%s\n"% dna)
+        newfile.flush()
+        os.fsync(newfile.fileno())
         
     template.close()
     newfile.close()

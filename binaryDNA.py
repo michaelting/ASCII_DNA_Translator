@@ -5,6 +5,7 @@ Alternate DNA representation for 256-ASCII character encoding
 
 Michael Ting
 1 August 2013
+Updated 2 August 2013
 
 DNA is a direct conversion of binary code to DNA bases:
     0: A or C
@@ -22,7 +23,7 @@ zero or one do not yield excess/deficiencies of:
             are present than 0's
 """
 
-import random
+import os, random
 
 binzero2dna = { 0:'A',
                '0':'A',
@@ -63,6 +64,8 @@ class BinaryTextToDNA:
         
         for line in self.translate_file_dna(template):
             newfile.write(line+"\n")
+            newfile.flush()
+            os.fsync(newfile.fileno())
             print line
             
         template.close()
@@ -116,6 +119,8 @@ class DNAToBinaryText:
         
         for line in self.translate_file_chr(template):
             newfile.write(line+"\n")
+            newfile.flush()
+            os.fsync(newfile.fileno())
             print line
             
         template.close()
