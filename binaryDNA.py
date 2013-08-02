@@ -24,15 +24,15 @@ zero or one do not yield excess/deficiencies of:
 
 import random
 
-binzero2dna = { 2:'A',
-               '2':'A',
-                3:'C',
-               '3':'C'}
+binzero2dna = { 0:'A',
+               '0':'A',
+                1:'C',
+               '1':'C'}
     
-binone2dna = { 2:'G',
-              '2':'G',
-               3:'T',
-              '3':'T'}
+binone2dna = { 0:'G',
+              '0':'G',
+               1:'T',
+              '1':'T'}
             
 bin2dna = {0:binzero2dna,
            '0':binzero2dna,
@@ -79,7 +79,14 @@ class BinaryTextToDNA:
         binary = ''.join('{:08b}'.format(ord(c)) for c in txtstr)
         translated = ''
         for symbol in binary:
-            choice = random.randint(2,3)    # determine which base to use        
+            choice = random.randint(0,1)    # determine which base to use
+
+            # avoid homopolymers
+            # not an issue for sequencing, but can create excess 2' structure
+            # due to reduced variation in subsequences
+            if translated[-1:] == bin2dna[symbol][choice]:
+                choice = (choice + 1) % 2
+        
             translated += bin2dna[symbol][choice]        
         return translated
     
