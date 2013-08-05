@@ -5,7 +5,7 @@
 # 2 August 2013									#
 #===============================================================================#
 
-Package to translate ASCII text to DNA. 
+Package to encode ASCII text into DNA as an information storage medium.
 
 Two options are available:
  - 4-Base Codon Translation
@@ -132,5 +132,8 @@ Input DNA files should be formatted as plain strings of upper-case DNA:
 	CCAC
 	ATCGAGACCCCA
 
-DNA strings should be of length being a multiple of 4. Handling of DNA 
+For 4-base codons, length of DNA strings should be a multiple of 4. Handling of DNA 
 with lengths indivisible by 4 will be implemented in the future.
+
+For binary encoding, length of DNA strings should be a multiple of 8, as the binary
+enconding of DNA utilizes 8 bits for each character in 256-ASCII.
