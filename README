@@ -56,6 +56,28 @@ ASCII characters.
 - Handle DNA strings of length indivisible by 4
 - Allow reverse translation in 4 different reading frames
 
+#====================#
+# Encoding Quick Use #
+#====================#
+
+Codons:
+
+Modify the "infile" variable in run_encode_codon.py to the name of the ASCII
+text file you want to convert into DNA. You may also choose to modify the 
+outfile and check file names. Then run the command:
+	
+    $ python run_encode_codon.py
+
+Binary:
+
+Modify the "infile" variable in run_encode_binary.py to the name of the ASCII
+text file you want to convert into DNA. You may also choose to modify the
+outfile and check file names. Then run the command:
+
+    $ python run_encode_binary.py
+
+Both programs will produce output files (outfile) and check files (check).
+
 #===================#
 # Using ASCIIcodons #
 #===================#
@@ -137,3 +159,86 @@ with lengths indivisible by 4 will be implemented in the future.
 
 For binary encoding, length of DNA strings should be a multiple of 8, as the binary
 enconding of DNA utilizes 8 bits for each character in 256-ASCII.
+
+#===================#
+# Chunker Quick Use #
+#===================#
+
+Codons:
+
+Modify the "infsta" variable in run_chunker_codon.py to the name of the FASTA
+file you want to convert into DNA. You may also choose to modify the 
+cfname, mfname, and trname variables. Then run the command:
+	
+    $ python run_chunker_codon.py
+
+Binary:
+
+Modify the "infsta" variable in run_chunker_binary.py to the name of the FASTA
+file you want to convert into DNA. You may also choose to modify the
+cfname, mfname, and trname variables. Then run the command:
+
+    $ python run_chunker_binary.py
+
+Both programs will produce a 150bp long chunk file (cfname), a chunk file with
+front adaptors removed (mfname), and a translation file as a check for correct
+encoding (trname).
+
+#=====================#
+# Codon Array Chunker #
+#=====================#
+
+- Run with contig and step size as 76
+- TAG at head of dna is format $ _ _ # _ _ _
+  meaning 7 characters, so 28 DNA bases
+- To ensure mod 4, pad the ends of the DNA with 2 bases (106 --> 104, padded with AA at the end)
+- 104-28 = 76 for the chunk size
+- stuffer sequence is TGAC, corresponding to single quote '
+
+Steps to replicate:
+$ python arraychunker.py infile.fasta outfile.txt 76 76 TGAC
+$ python
+>>> import os
+>>> infile = open("outfile.txt","r")
+>>> newfile = open("new.txt","w")
+>>> for line in infile:
+...     newfile.write("%s\n" % line[2:])    # to account for correct reading frame since adaptor is 22 bp
+...	newfile.flush()
+...	os.fsync(newfile.fileno())
+>>>	infile.close()
+>>>	newfile.close()
+$ ls
+$ python
+>>> from ASCIIcodons import *
+>>> o = DNAToText()
+>>> o.translate("new.txt","trans.txt")
+
+#======================#
+# Binary Array Chunker #
+#======================#
+
+- Run with contig and step size as 48
+- TAG at head of dna is format $ _ _ # _ _ _
+  meaning 7 characters, so 56 DNA bases
+- To ensure mod 8, pad the ends of the DNA with 2 bases (106 --> 104, padded with AA at the end)
+- 104-56 = 48 for the chunk size
+- stuffer sequence is TGAC, corresponding to single quote '
+
+Steps to replicate:
+$ python binarraychunker.py infile.txt outfile.txt 48 48 ACGACTGT
+$ python
+>>> import os
+>>> infile = open("outfile.txt","r")
+>>> newfile = open("new.txt","w")
+>>> for line in infile:
+...     newfile.write("%s\n" % line[22:126])    # to account for correct reading frame since adaptor is 22 bp
+...		newfile.flush() 						# for huge files, may stop writing, so we need to flush I/O
+...		os.fsync(newfile.fileno())
+>>> infile.close()
+>>> newfile.close()
+$ ls
+$ python
+>>> from binaryDNA import *
+>>> o = DNAToBinaryText()
+>>> o.translate("new.txt","trans.txt")
+
