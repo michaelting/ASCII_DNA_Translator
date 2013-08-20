@@ -3,9 +3,13 @@
 """
 Alternate DNA representation for 256-ASCII character encoding
 
-Michael Ting
-1 August 2013
+Created 1 August 2013
 Updated 2 August 2013
+
+Copyright 2013 Michael Ting
+https://github.com/michaelting
+Released under the BSD 2-clause license. See LICENSE.
+http://opensource.org/licenses/BSD-2-Clause
 
 DNA is a direct conversion of binary code to DNA bases:
     0: A or C

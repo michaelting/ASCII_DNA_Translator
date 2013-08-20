@@ -1,11 +1,15 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 DNA representation of 256-ASCII Character Encoding
 
-Michael Ting
-15 July 2013
+Created 15 July 2013
 Updated 2 August 2013
+
+Copyright 2013 Michael Ting
+https://github.com/michaelting
+Released under the BSD 2-clause license. See LICENSE.
+http://opensource.org/licenses/BSD-2-Clause
 
 DNA is represented alphabetically as base 4:
     A - 0
@@ -14,7 +18,6 @@ DNA is represented alphabetically as base 4:
     T - 3
     
 4-base codons will be used to represent the 256 Extended ASCII encodings
-
 """
 
 import itertools, os

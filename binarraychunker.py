@@ -1,7 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 Splits a FASTA file of DNA into pieces for array orders
+
+Copyright 2013 Michael Ting
+https://github.com/michaelting
+Released under the BSD 2-clause license. See LICENSE.
+http://opensource.org/licenses/BSD-2-Clause
 
 ***REQUIRED***
 
@@ -24,8 +29,6 @@ $ python
 >>> from binaryDNA import *
 >>> o = DNAToBinaryText()
 >>> o.translate("framecorrect.txt","h_readable.txt")
-
-
 """
 
 import os

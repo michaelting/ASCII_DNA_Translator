@@ -1,11 +1,135 @@
 
 #===============================================================================#
 # ASCII Text to DNA Translator							#
-# Michael Ting									#
-# 2 August 2013									#
+# Updated 20 August 2013							#
+# Copyright 2013 Michael Ting							#
+# Released under the BSD 2-clause license. See LICENSE file.			#
+# http://opensource.org/licenses/BSD-2-Clause					#
 #===============================================================================#
 
-Package to encode ASCII text into DNA as an information storage medium.
+#================#
+# The Experiment #
+#================#
+
+The purpose of ASCIIcodons is to test the viability of DNA
+as an information storage medium. The experiment attempts to
+reconstruct information encoded in DNA, given the information-
+encoded DNA samples themselves (assuming the sequence information
+could be read) and a translation table between the DNA encoding 
+scheme and 256-ASCII.
+
+An issue with encoding information in DNA is that DNA synthesis 
+becomes increasingly difficult as the length of the DNA to be 
+synthesized increases. To efficiently produce such encoding DNA,
+the DNA must be split into smaller oligos, which are much cheaper
+to produce and tend to be more accurate than longer sequences.
+However, producing much smaller oligos means we must also know
+how to place these oligos in the correct order to read out
+the correct information once assembled.
+
+To establish order, we need to rely on some secondary encoding 
+scheme to indicate how the DNA pieces should be reconstructed. 
+This was performed using DNA tags at the header of each oligo.
+Tags indicate global positioning of each oligo.
+
+Our dataset consisted of a set of "profile" information belonging
+to separate persons. Tags included a person ID number (one for 
+each person) and an oligo ID number for positioning of information
+in each person's profile.
+
+Using these tags, a MapReduce-like algorithm is used to sort
+oligo sequencing reads and obtain a consensus for each of those 
+reads (multiple reads of the same sequence can occur many 
+times during sequencing). After obtaining a consensus sequence 
+(which is asserted to have more accurate information than the 
+individual oligos themselves), the oligo sequences are concatenated
+to produce a much longer DNA sequence, which when decoded, yields 
+the original encoded information.
+
+#============#
+# Algorithms #
+#============#
+
+Data was encoded into DNA using 4-base codon translation, and
+subsequently chunked and ordered on a DNA CustomArray.
+
+The DNA from the CustomArray order was sequenced using
+Illumina MiSeq, with results found in two FASTQ read files. These
+reads were merged using SeqPrep to produce a cleaner merged
+sequencing FASTQ file.
+
+To reconstruct information from the sequencing reads, each DNA
+sequence contains a 28-base long header tag indicating person
+ID and oligo ID. Information is reconstructed in a manner
+similar to the MapReduce algorithm:
+
+1. (MAP): 
+   Sequences from the FASTQ Illumina MiSeq sequencing file are
+   read and sorted into files based on person ID and oligo ID
+   in a newly created subfolder. Sequences with identical tags 
+   are concatenated onto the same file, so we have unique files 
+   for each tag.
+2. (COMBINE):
+   Each file containing a list of oligo sequences is condensed
+   into a consensus sequence by taking the maximum occurrence of
+   a DNA base at each position in the sequence. The sequences are
+   aligned based on the location of the start of the tag. (This 
+   step could be improved with alignment, such as Smith-Waterman
+   alignment). Each file now has a single DNA sequence.
+3. (REDUCE):
+   Oligos for each person are concatenated into a single condensed
+   DNA file. The condensed file is translated from 4-base DNA codons 
+   to 256-character ASCII.
+
+#=======================================#
+# Future Improvements to the Experiment #
+#=======================================#
+
+- Parallelization of MapReduce-like algorithm would make the run
+  much faster (as MapReduce is intended for parallelization). For
+  the purposes of this experiment, the algorithm was intended to be
+  run by a single user on a single machine.
+
+- The COMBINE step may benefit from more accurate alignment,
+  such as with the use of an alignment method like Smith-Waterman
+  
+- Develop faster parsing solutions for FASTQ files. Illumina
+  MiSeq FASTQ files are generally very large, on the order of
+  10-20GB. Both faster parsing and parallelization would speed
+  up information reconstruction from sequencing reads.
+
+- Use DNA error-correction codes on the tags, messages, or both.
+  This will help filter out erroneous reads due to synthesis or
+  sequencing and eliminate junk data with incorrect tags.
+  Synthesis and sequencing can introduce errors in sequence 
+  information in the form of base insertions/deletions or 
+  sequencing mis-reads due to homopolymers, chemical errors
+  during sequencing, etc.
+
+- 4-Base Codon Encoding:
+  A known issue is that standard English alphabet characters are 
+  encoded within the range of values 64-128, meaning using base 4
+  encoding creates a skewed	distribution of DNA codons when sampling
+  the alphabet. All alphabetical characters will begin with the same
+  base in the initial base position, which can result in high GC 
+  content for long strings of English text, given that the first base
+  is C or G.
+
+  There is a quick, but temporary, fix for this - mapping T:0, A:1, 
+  G:2, C:3 - but these mappings are arbitrary and still skew the 
+  distribution towards AT.
+
+  A better solution would be to randomize the mapping of codons to
+  ASCII characters and/or reduce the number of bases used in the 
+  codons by eliminating unused ASCII characters.
+
+  * Change the distribution of character mappings to be more uniform
+  * Handle DNA strings of length indivisible by 4
+  * Allow reverse translation in 4 different reading frames  
+  
+#==================#
+# Encoding Methods #
+#==================#
 
 Two options are available:
  - 4-Base Codon Translation
@@ -31,30 +155,6 @@ Therefore, one character corresponds to 4 DNA bases.
 binaryDNA encodes one-to-one between binary and DNA bases, with 0 mapping to
 A or C and 1 mapping to G or T. Binary representations of ASCII codes are
 a byte (or 8 bits) long, so one character corresponds to 8 DNA bases.
-
-#=============#
-# Future Work #
-#=============#
-
-===Codons===
-
-A known issue is that standard English alphabet characters are encoded within
-the range of values 64-128, meaning using base 4 encoding creates a skewed
-distribution of DNA codons when sampling the alphabet. All alphabetical
-characters will begin with the same base in the initial base position, which
-can result in high GC content for long strings of English text, given that
-the first base is C or G.
-
-There is a quick, but temporary, fix for this - mapping T:0,A:1,G:2,C:3 - but
-these mappings are arbitrary and still skew the distribution towards AT.
-
-A better solution would be to randomize the mapping of codons to ASCII characters
-and/or reduce the number of bases used in the codons by eliminating unused
-ASCII characters.
-
-- Change the distribution of character mappings to be more uniform
-- Handle DNA strings of length indivisible by 4
-- Allow reverse translation in 4 different reading frames
 
 #====================#
 # Encoding Quick Use #
@@ -242,3 +342,16 @@ $ python
 >>> o = DNAToBinaryText()
 >>> o.translate("new.txt","trans.txt")
 
+#====================================#
+# Using MapReduce on Sequencing Data #
+#====================================#
+
+The algorithm can be run by executing get_unique_oligos.py.
+
+To modify the input sequencing file, modify the path of 
+"parser" in main().
+
+To modify the output location of the results, modify the
+path of "treepath" in main().
+
+Results will be placed in a folder specified by "treepath".

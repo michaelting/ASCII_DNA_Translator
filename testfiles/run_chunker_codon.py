@@ -1,17 +1,26 @@
 #!/usr/bin/env python
 
+"""
+Converter script to produce CustomArray oligos for codons
+
+Copyright 2013 Michael Ting
+https://github.com/michaelting
+Released under the BSD 2-clause license. See LICENSE.
+http://opensource.org/licenses/BSD-2-Clause
+"""
+
 from os import fsync
 from subprocess import call
-from binaryDNA import *
+from ASCIIcodons import *
 
 infsta = "infile.fasta"
-cfname = "chunker_bin.txt"
-mfname = "chunker_rmfront_bin.txt"
-trname = "chunker_trans_bin.txt"
+cfname = "chunker_codon.txt"
+mfname = "chunker_rmfront_codon.txt"
+trname = "chunker_trans_codon.txt"
 
 print "Running arraychunker.py on %s" % infsta
 
-call(['python','binarraychunker.py',infsta,cfname,'48','48','ACGACTGT'])
+call(['python','arraychunker.py',infsta,cfname,'76','76','TGAC'])
 
 print "Array chunks placed in %s" % cfname
 
@@ -28,7 +37,7 @@ newfile.close()
 
 print "Removed front adaptors from DNA, results in %s" % mfname
 
-obj = DNAToBinaryText()
+obj = DNAToText()
 obj.translate(mfname, trname)
 
 print "DNA translated in %s" % trname
