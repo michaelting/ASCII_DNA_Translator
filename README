@@ -64,20 +64,19 @@ sequence contains a 28-base long header tag indicating person
 ID and oligo ID. Information is reconstructed in a manner
 similar to the MapReduce algorithm:
 
-1. (MAP): 
+1. (SORT/MAP): 
    Sequences from the FASTQ Illumina MiSeq sequencing file are
-   read and sorted into files based on person ID and oligo ID
-   in a newly created subfolder. Sequences with identical tags 
-   are concatenated onto the same file, so we have unique files 
-   for each tag.
-2. (COMBINE):
-   Each file containing a list of oligo sequences is condensed
-   into a consensus sequence by taking the maximum occurrence of
-   a DNA base at each position in the sequence. The sequences are
-   aligned based on the location of the start of the tag. (This 
-   step could be improved with alignment, such as Smith-Waterman
-   alignment). Each file now has a single DNA sequence.
-3. (REDUCE):
+   read and sorted into buckets based on person ID and oligo ID
+   in a dictionary data structure. Sequences with identical tags 
+   are placed in the same bucket, so we have unique buckets for
+   each tag. Sequences are recorded by keeping track of the
+   counts of base appearances at each index in the sequence
+   through the use of a base counter.
+2. (CONSENSUS/COMBINE):
+   Each bucket containing a list of counters for each index is
+   condensed into a consensus sequence by taking the maximum occurrence 
+   of a DNA base at each position in the sequence.
+3. (CONDENSE/REDUCE):
    Oligos for each person are concatenated into a single condensed
    DNA file. The condensed file is translated from 4-base DNA codons 
    to 256-character ASCII.
@@ -92,13 +91,9 @@ similar to the MapReduce algorithm:
   run by a single user on a single machine.
 
 - The COMBINE step may benefit from more accurate alignment,
-  such as with the use of an alignment method like Smith-Waterman
+  such as with the use of an alignment method like Smith-Waterman,
+  rather than relying on a regex pattern to fix the alignment.
   
-- Develop faster parsing solutions for FASTQ files. Illumina
-  MiSeq FASTQ files are generally very large, on the order of
-  10-20GB. Both faster parsing and parallelization would speed
-  up information reconstruction from sequencing reads.
-
 - Use DNA error-correction codes on the tags, messages, or both.
   This will help filter out erroneous reads due to synthesis or
   sequencing and eliminate junk data with incorrect tags.
