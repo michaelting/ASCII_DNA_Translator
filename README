@@ -75,11 +75,14 @@ similar to the MapReduce algorithm:
 2. (CONSENSUS/COMBINE):
    Each bucket containing a list of counters for each index is
    condensed into a consensus sequence by taking the maximum occurrence 
-   of a DNA base at each position in the sequence.
+   of a DNA base at each position in the sequence. Erroneous sequences
+   are filtered out by using a count threshold (low counts imply
+   erroneous sequences)
 3. (CONDENSE/REDUCE):
    Oligos for each person are concatenated into a single condensed
    DNA file. The condensed file is translated from 4-base DNA codons 
-   to 256-character ASCII.
+   to 256-character ASCII. Erroneous sequences are ignored when
+   writing output files.
 
 #=======================================#
 # Future Improvements to the Experiment #
